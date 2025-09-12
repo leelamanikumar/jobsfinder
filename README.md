@@ -56,18 +56,25 @@ Health: `GET http://localhost:5000/health`
 
 Jobs API: `http://localhost:5000/api/jobs`
 
-## Deploy backend to Render
+## Deploy to Render (Frontend + Backend)
 
-We include `render.yaml` for one-click deploy.
+We include `render.yaml` for one-click deploy of both services.
 
 Steps:
 
 1. Push this repo to GitHub.
-2. In Render, create a new Blueprint from your repo; it will detect `render.yaml`.
-3. Set environment variables in the Render service:
-   - `MONGODB_URI` = your MongoDB Atlas connection string
-   - `CORS_ORIGIN` = your frontend origin (e.g., `https://your-frontend.onrender.com` or `*` for testing)
-4. Deploy. Render builds using `backend/` as `rootDir`, runs `npm run build` then `npm start`.
-5. Health check path: `/health` should return `{ status: 'ok' }`.
+2. In Render, create a new Blueprint from your repo; it will detect `render.yaml` and create both services.
+3. Set environment variables:
 
-Frontend note: set `VITE_API_URL` to your Render backend URL and rebuild the frontend.
+   **Backend service:**
+   - `MONGODB_URI` = your MongoDB Atlas connection string
+   - `CORS_ORIGIN` = your frontend Render URL (e.g., `https://jobfinder-frontend.onrender.com`)
+
+   **Frontend service:**
+   - `VITE_API_URL` = your backend Render URL (e.g., `https://jobfinder-backend.onrender.com`)
+
+4. Deploy both services. 
+   - Backend health check: `/health` should return `{ status: 'ok' }`
+   - Frontend will be available at the provided URL
+
+**Note:** After deployment, update the backend's `CORS_ORIGIN` with the actual frontend URL from Render.
