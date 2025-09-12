@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../components/ui/select";
+import { apiPost } from "../../../../lib/api";
 
 interface CreateJobSectionProps {
   onBack: () => void;
@@ -34,11 +35,30 @@ export const CreateJobSection = ({ onBack }: CreateJobSectionProps): JSX.Element
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Job created:", formData);
-    onBack();
+    if (!formData.jobTitle || !formData.companyName || !formData.location || !formData.jobType || !formData.jobDescription) {
+      alert("Please fill all required fields");
+      return;
+    }
+    const payload = {
+      title: formData.jobTitle,
+      company: formData.companyName,
+      location: formData.location,
+      description: formData.jobDescription,
+      salaryMin: Number(formData.salaryMin) || undefined,
+      salaryMax: Number(formData.salaryMax) || undefined,
+      jobType: formData.jobType,
+      applicationDeadline: formData.applicationDeadline,
+    } as const;
+    try {
+      await apiPost("/api/jobs", payload);
+      onBack();
+    } catch (err) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Failed to create job";
+      alert(message);
+    }
   };
 
   return (
@@ -99,7 +119,7 @@ export const CreateJobSection = ({ onBack }: CreateJobSectionProps): JSX.Element
                   <label className="text-sm font-semibold text-gray-700 [font-family:'Satoshi_Variable-Bold',Helvetica]">
                     Location *
                   </label>
-                  <Select onValueChange={(value) => handleInputChange("location", value)}>
+                  <Select value={formData.location} onValueChange={(value) => handleInputChange("location", value)}>
                     <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 [font-family:'Satoshi_Variable-Medium',Helvetica]">
                       <SelectValue placeholder="Select location" />
                     </SelectTrigger>
@@ -131,7 +151,7 @@ export const CreateJobSection = ({ onBack }: CreateJobSectionProps): JSX.Element
                   <label className="text-sm font-semibold text-gray-700 [font-family:'Satoshi_Variable-Bold',Helvetica]">
                     Job Type *
                   </label>
-                  <Select onValueChange={(value) => handleInputChange("jobType", value)}>
+                  <Select value={formData.jobType} onValueChange={(value) => handleInputChange("jobType", value)}>
                     <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 [font-family:'Satoshi_Variable-Medium',Helvetica]">
                       <SelectValue placeholder="Select job type" />
                     </SelectTrigger>

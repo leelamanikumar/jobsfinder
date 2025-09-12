@@ -29,3 +29,45 @@ If you are satisfied with the result, you can finally build the project for rele
 ```
 npm run build
 ```
+
+## Backend (Express + MongoDB)
+
+Backend code is in `backend/`.
+
+### Setup
+
+1. Create `.env` in `backend/`:
+
+```
+PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/jobfinder
+CORS_ORIGIN=http://localhost:5173
+```
+
+2. Install and run:
+
+```
+cd backend
+npm install
+npm run dev
+```
+
+Health: `GET http://localhost:5000/health`
+
+Jobs API: `http://localhost:5000/api/jobs`
+
+## Deploy backend to Render
+
+We include `render.yaml` for one-click deploy.
+
+Steps:
+
+1. Push this repo to GitHub.
+2. In Render, create a new Blueprint from your repo; it will detect `render.yaml`.
+3. Set environment variables in the Render service:
+   - `MONGODB_URI` = your MongoDB Atlas connection string
+   - `CORS_ORIGIN` = your frontend origin (e.g., `https://your-frontend.onrender.com` or `*` for testing)
+4. Deploy. Render builds using `backend/` as `rootDir`, runs `npm run build` then `npm start`.
+5. Health check path: `/health` should return `{ status: 'ok' }`.
+
+Frontend note: set `VITE_API_URL` to your Render backend URL and rebuild the frontend.
